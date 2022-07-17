@@ -1,6 +1,9 @@
 import Head from 'next/head'
+import Footer from "../components/Footer";
+import { useRouter } from "next/router";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div>
       <Head>
@@ -9,7 +12,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className='text-red-600'>hello world!!</div>
+      <div className=''>
+        <nav className=''>
+          <div className=''>About</div>
+          <div className=''>Sign in</div>
+          <div className=''>Sign up</div>
+        </nav>
+        <div className=''>
+        </div>
+      </div>
+      <Footer />
     </div>
   )
 }
