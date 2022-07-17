@@ -1,9 +1,14 @@
 import Head from 'next/head'
 import Footer from "../components/Footer";
 import { useRouter } from "next/router";
+import { useRecoilState } from "recoil";
+import { modalState } from "../atom/modalAtom";
+import Image from "next/image";
 
-export default function Home() {
+export default function Home({randomUsers}) {
   const router = useRouter();
+  const [aboutModal, setAboutModal] = useRecoilState(modalState);
+
   return (
     <div>
       <Head>
@@ -12,16 +17,65 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className=''>
-        <nav className=''>
-          <div className=''>About</div>
-          <div className=''>Sign in</div>
-          <div className=''>Sign up</div>
-        </nav>
+      <div className='relative'>
+        <div className='absolute top-0 z-50 flex flex-col md:flex-row w-full py-4 px-6'>
+          <div className='ml-6 mt-'>
+            <h1 className='text-2xl font-bold openSanBold'>Muscle and Health</h1>
+          </div>
+          <nav className='flex ml-auto openSan'>
+            <div className='hoverEffect px-6 mr-4' onClick={() => setAboutModal(!aboutModal)}>About</div>
+            <div className='hoverEffect px-6 mr-4'>Sign in</div>
+            <div className='hoverEffect px-6 mr-4'>Sign up</div>
+          </nav>
+        </div>
         <div className=''>
+          <div className='relative w-[auto] min-h-[100vh]'>
+            <Image src="/backgroundImage.jpg" layout='fill' alt="" />
+            <div className='flex flex-col items-center justify-center w-full h-full absolute'>
+              {!aboutModal && (
+                <>
+                  <h2 className='openSanBold text-white text-4xl'>Always do activity and healthy</h2>
+                  <div className='mt-6'>
+                    <button className='mx-4 hoverEffect px-6 openSan text-white border border-white hover:bg-blue-600'>sign in</button>
+                    <button className='mx-4 hoverEffect px-6 openSan text-white border border-white hover:bg-sky-600'>sign up</button>
+                  </div>
+                </>
+              )}
+              {aboutModal && (
+                <div className='w-[80%] h-[70vh] bg-gradient-to-r from-cyan-500 to-blue-500 opacity-75 cursor-pointer flex justify-center p-6' onClick={() => setAboutModal(false)}>
+                  <div className=''>
+                    <h2 className='font-bold text-white text-2xl'>このアプリについて</h2>
+                    <p>最近健康が気になる方、体を鍛えたい方におススメです。</p>
+                  </div>
+                  <div className="">
+                    <h3>今、こちらのユーザーが新しく使い始めましたしました</h3>
+                    <div className="">
+                    {randomUsers.results.slice(0, 5).map((user) => {
+                      <div className="w-[40px] h-[40px]" key={user.login.username}>
+                        <img className="rounded-full" width="40" src={user.picture.thumbnail} alt="" />
+                      </div>
+                    })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  const randomUsers = await fetch(
+    "https://randomuser.me/api/?results=10&inc=name,login,picture"
+  ).then((res) => res.json());
+
+  return{
+    props: {
+      randomUsers,
+    },
+  };
 }
